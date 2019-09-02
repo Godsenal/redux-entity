@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Store } from "./redux/reducer";
+import { fetchData } from "./redux/action";
 
 const App: React.FC = () => {
+  const dispatch = useDispatch();
+  const { status, items, error } = useSelector((state: Store) => state);
+
+  const [input, setInput] = useState("");
+  const handleInput: React.ChangeEventHandler<HTMLInputElement> = e =>
+    setInput(e.target.value);
+
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = e => {
+    e.preventDefault();
+    dispatch(fetchData(input));
+  };
+
+  if (error) {
+    return <h1>{error}</h1>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>
+        <form onSubmit={handleSubmit}>
+          <input value={input} onChange={handleInput} />
+          <button type="submit">확인</button>
+        </form>
+      </div>
+      <div>
+        <h2>Status {status}</h2>
+      </div>
+      <div>
+        {items.map(({ id, title, body, userId }) => (
+          <div key={id}>
+            <h1>
+              {title} by User {userId}
+            </h1>
+            <p>{body}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
